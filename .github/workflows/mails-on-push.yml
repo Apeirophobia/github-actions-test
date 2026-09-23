@@ -1,10 +1,30 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: Send email on push
+on: 
+    push:
+        branches: 
+            - main
+    workflow_dispatch:
+
 jobs:
-  Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+    mail-on-push: 
+        runs-on: unbuntu-latest
+        steps:
+            - name: Send mail
+              uses: dawidd6/action-send-mail@v3
+              with:
+                server_address: smtp.gmail.com
+                server_port: 465
+                secure: true
+                username: ${{secrets.MAIL_USERNAME}}
+                password: ${{secrets.MAIL_PASSWORD}}
+                
+                subject: "Push to ${{github.repository}}"
+                body: |
+                    Repository: ${{github.repository}}
+                    Branch: ${{ github.ref_name }}
+                    User: ${{github.event.pusher.name}}
+                    Commit SHA: ${{github.sha}}
+                    Commit message: ${{github.event.head_commit.message}}
+
+                    to: ervinpusijainen@gmail.com
+                    from: Github Actions
